@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# No need in locate db and its heavy updatedb process
+dnf -y remove mlocate
+# Comment out to skip updates as it may take too long..
+dnf -y upgrade
+# Install required and usefull tools
+dnf -y install podman tmux
+
+IMAGE="${image}"
+ARGS="${args}"
+VPN_VENDOR=${vpn_vendor}
+
+# Config for VPN container
+if [[ $VPN_VENDOR == "protonvpn" ]]; then
+    echo 'DEBUG=1
+PROTONVPN_USERNAME=${vpn_username}
+PROTONVPN_PASSWORD=${vpn_password}
+PROTONVPN_TIER=${protonvpn_tier}
+PROTONVPN_SERVER=${protonvpn_server}' >/etc/protonvpn.env
+fi
+
+if [[ $VPN_VENDOR != "none" ]]; then
+    APP="$${IMAGE##*/}"
+    NAME="$APP-$VPN_VENDOR"
+    # Group containers in pod
+    podman pod create --name $NAME
+else
+    NAME="$${IMAGE##*/}"
+fi
+
+# Create VPN container
+if [[ $VPN_VENDOR == "protonvpn" ]]; then
+    podman create \
+        --pod $NAME \
+        --name $VPN_VENDOR \
+        --device=/dev/net/tun \
+        --privileged \
+        --env-file=/etc/protonvpn.env \
+        ghcr.io/tprasadtp/protonvpn
+fi
+
+# Create main app container
+if [[ $VPN_VENDOR != "none" ]]; then
+    podman create \
+        --pod $NAME \
+        --name $APP \
+        --label "io.containers.autoupdate=registry" \
+        --pull=always \
+        --tty \
+        --network=container:$VPN_VENDOR \
+        $IMAGE $ARGS
+else
+    podman create \
+        --name $NAME \
+        --label "io.containers.autoupdate=registry" \
+        --pull=always \
+        --tty \
+        $IMAGE $ARGS
+fi
+
+# Generate and install systemd service units
+podman generate systemd --restart-policy=always --new --files --name $NAME
+mv -Z ./{pod,container}-*.service /etc/systemd/system/
+systemctl daemon-reload
+
+# Enable and start appropriate systemd service units
+if [[ $VPN_VENDOR != "none" ]]; then
+    systemctl enable --now pod-$NAME.service
+else
+    systemctl enable --now container-$NAME.service
+fi
+
+# Enable daily auto-update of container images
+systemctl enable --now podman-auto-update.timer

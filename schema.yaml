@@ -1,0 +1,254 @@
+title: VMs running Podman containers as a systemd service
+description: Fuck russia.
+informationalText: 2 x AMD VM.Standard.E2.1.Micro instances running db1000n; 2 x ARM VM.Standard.A1.Flex instances running mhddos_proxy
+schemaVersion: 1.1.0
+version: "20220608"
+locale: "en"
+
+variableGroups:
+  - title: "Hidden Variable Group"
+    visible: false
+    variables:
+      # - fingerprint
+      # - private_key_path
+      - region
+      - tenancy_ocid
+      - current_user_ocid
+      - compartment_ocid
+      - label_prefix
+      - vcn_cidrs
+      - vcn_dns_label
+      - vcn_name
+      - instance_ad_number
+      - instance_nonflex_count
+      - instance_flex_count
+      - instance_flex_memory_in_gbs
+      - instance_flex_ocpus
+      - instance_state
+      - shape_nonflex
+      - shape_flex
+      - source_type
+      - nonflex_container_image
+      - nonflex_container_image_args
+      - flex_container_image
+      - flex_container_image_args
+
+variables:
+
+######################################################
+##############    HIDDEN VARIABLES       #############
+######################################################
+
+  tenancy_ocid:
+    title: Tenancy ID
+    description: The Oracle Cloud Identifier (OCID) for your tenancy
+    type: string
+    required: true
+
+  region:
+    title: Region
+    description: The region in which to create all resources
+    type: oci:identity:region:name
+    required: true
+
+  compartment_ocid:
+    title: Target Compartment
+    description: The target compartment for all of the provisioned resources
+    type: oci:identity:compartment:id
+    required: true
+
+######################################################
+##############    COMPUTE VARIABLES      #############
+######################################################
+
+  source_ocid_nonflex:
+    title: Non-flex VM Image
+    description: Use the latest version of Oracle Linux
+    type: oci:core:image:id
+    dependsOn:
+      compartmentId: compartment_ocid
+      operatingSystem: "Oracle Linux"
+      operatingSystemVersion: "8"
+      shape: shape_nonflex
+    required: true
+
+  source_ocid_flex:
+    title: Flex VM Image
+    description: Use the latest version of Oracle Linux
+    type: oci:core:image:id
+    dependsOn:
+      compartmentId: compartment_ocid
+      operatingSystem: "Oracle Linux"
+      operatingSystemVersion: "8"
+      shape: shape_flex
+    required: true
+
+  ssh_public_keys:
+    title: SSH Public Key
+    description: Public SSH Key to access VM via SSH
+    type: oci:core:ssh:publickey
+
+  nonflex_vpn_vendor:
+    title: VPN vendor for Non-flex VMs
+    description: Select VPN provider for containers on non-flex instances. Leave this as "none" to run without a VPN
+    type: enum
+    enum:
+      - "none"
+      - "protonvpn"
+    default: "none"
+    required: true
+
+  flex_vpn_vendor:
+    title: VPN vendor for Flex VMs
+    description: Select VPN provider for containers on flex instances. Leave this as "none" to run without a VPN
+    type: enum
+    enum:
+      - "none"
+      - "protonvpn"
+    default: "none"
+    required: true
+
+  vpn_username:
+    visible:
+      or:
+        - not:
+            - eq:
+              - nonflex_vpn_vendor
+              - "none"
+        - not:
+            - eq:
+              - flex_vpn_vendor
+              - "none"
+    title: VPN username
+    description: Username for the selected VPN provider
+    type: string
+    required: true
+
+  vpn_password:
+    visible:
+      or:
+        - not:
+            - eq:
+              - nonflex_vpn_vendor
+              - "none"
+        - not:
+            - eq:
+              - flex_vpn_vendor
+              - "none"
+    title: VPN password
+    description: Password for the selected VPN provider
+    type: string
+    required: true
+
+  protonvpn_tier:
+    visible:
+      or:
+        - eq:
+          - nonflex_vpn_vendor
+          - "protonvpn"
+        - eq:
+          - flex_vpn_vendor
+          - "protonvpn"
+    title: ProtonVPN subscription plan
+    description: 0=Free, 1=Mail Plus, 2=VPN Plus, 3=Proton Unlimited
+    type: enum
+    enum:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+    default: "2"
+
+  protonvpn_server:
+    visible:
+      or:
+        - eq:
+          - nonflex_vpn_vendor
+          - "protonvpn"
+        - eq:
+          - flex_vpn_vendor
+          - "protonvpn"
+    title: ProtonVPN server country
+    description: Choose VPN server location
+    type: enum
+    enum:
+      - RANDOM
+      - AE
+      - AR
+      - AT
+      - AU
+      - BE
+      - BG
+      - BR
+      - CA
+      - CH
+      - CL
+      - CO
+      - CR
+      - CY
+      - CZ
+      - DE
+      - DK
+      - EE
+      - EG
+      - ES
+      - FI
+      - FR
+      - GE
+      - GR
+      - HK
+      - HU
+      - IE
+      - IL
+      - IN
+      - IS
+      - IT
+      - JP
+      - KH
+      - KR
+      - LT
+      - LU
+      - LV
+      - MD
+      - MX
+      - MY
+      - NG
+      - NL
+      - NO
+      - NZ
+      - PE
+      - PH
+      - PL
+      - PR
+      - PT
+      - RO
+      - RS
+      - RU
+      - SE
+      - SG
+      - SI
+      - SK
+      - TH
+      - TR
+      - TW
+      - UA
+      - UK
+      - US
+      - VN
+      - ZA
+    default: "RANDOM"
+
+#############################################
+##############     OUTPUTS     ##############
+#############################################
+
+outputs:
+  instance_nonflex:
+    type: list
+    title: Non-flex instances summary info
+    displayText: Use this IPs to login to instances via SSH
+
+  instance_flex:
+    type: list
+    title: Flex instances summary info
+    displayText: Use this IPs to login to instances via SSH

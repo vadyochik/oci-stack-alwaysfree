@@ -1,0 +1,29 @@
+# provider identity parameters
+# api_fingerprint = ""
+# api_private_key_path = "~/.oci/user_key-2022-05-28T11_22_31.050Z.pem"
+region = "eu-zurich-1"
+tenancy_ocid = "ocid1.tenancy.oc1..aaaaa......"
+current_user_ocid = "ocid1.user.oc1..aaaaaa........"
+
+# general oci parameters
+compartment_ocid = "ocid1.compartment.oc1..aaaaaaa.........."
+# label_prefix = "alwaysfree"
+
+# compute instance parameters
+# https://docs.oracle.com/iaas/images/
+source_ocid_nonflex  = "ocid1.image.oc1.eu-zurich-1.aaaaaaaae7jrdyesfy3vm6o5eg3jfgpajmbmpho6kvsoh7vpx7seoigcr63q"
+source_ocid_flex  = "ocid1.image.oc1.eu-zurich-1.aaaaaaaalns3ua646ukiv52uhg64a2komgxldkc7ws6776427m6f73tdmu2q"
+
+# operating system parameters
+ssh_public_keys = <<EOT
+ssh-ed25519 AAAAC3NzaC1lZD..................xBPjRrK user1@host1.local
+ssh-ed25519 AAAAC3NzaC1lZD..................xBPjRrK user2@host2.local
+EOT
+
+# vpn parameters
+nonflex_vpn_vendor = "protonvpn"
+# flex_vpn_vendor = "protonvpn"
+vpn_username = "Nps..........90r"
+vpn_password = "oC............................1L"
+protonvpn_tier = "3"
+protonvpn_server = "CH"
