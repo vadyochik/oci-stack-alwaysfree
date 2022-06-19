@@ -1,6 +1,6 @@
 # provider identity parameters
-# api_fingerprint = ""
-# api_private_key_path = "~/.oci/user_key-2022-05-28T11_22_31.050Z.pem"
+fingerprint = "02:2d:e7:................................:25:aa"
+private_key_path = "~/.oci/user_key-2022-05-28T11_22_31.050Z.pem"
 region = "eu-zurich-1"
 tenancy_ocid = "ocid1.tenancy.oc1..aaaaa......"
 current_user_ocid = "ocid1.user.oc1..aaaaaa........"

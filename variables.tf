@@ -1,13 +1,15 @@
 # provider identity parameters
-# variable "fingerprint" {
-#   description = "fingerprint of oci api private key"
-#   type        = string
-# }
+variable "fingerprint" {
+  description = "fingerprint of oci api private key"
+  type        = string
+  default     = null
+}
 
-# variable "private_key_path" {
-#   description = "path to oci api private key used"
-#   type        = string
-# }
+variable "private_key_path" {
+  description = "path to oci api private key used"
+  type        = string
+  default     = null
+}
 
 variable "region" {
   description = "the oci region where resources will be created"

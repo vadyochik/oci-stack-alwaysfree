@@ -9,8 +9,8 @@ variableGroups:
   - title: "Hidden Variable Group"
     visible: false
     variables:
-      # - fingerprint
-      # - private_key_path
+      - fingerprint
+      - private_key_path
       - region
       - tenancy_ocid
       - current_user_ocid
