@@ -1,3 +1,8 @@
+locals {
+  # workaround for missing VM.Standard.E2.1.Micro shape in ADs #1 and #3 of eu-frankfurt-1 region
+  ad_number = var.shape_nonflex == "VM.Standard.E2.1.Micro" && var.region == "eu-frankfurt-1" ? 2 : var.instance_ad_number
+}
+
 module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
   version = "3.4.0"
@@ -22,7 +27,7 @@ module "instance_nonflex" {
   compartment_ocid = var.compartment_ocid
 
   # compute instance parameters
-  ad_number             = var.instance_ad_number
+  ad_number             = local.ad_number
   instance_count        = var.instance_nonflex_count
   instance_display_name = "${var.label_prefix}-nonflex"
   instance_state        = var.instance_state
@@ -50,6 +55,10 @@ module "instance_nonflex" {
   # networking parameters
   public_ip    = "EPHEMERAL"
   subnet_ocids = [oci_core_subnet.nonflex.id]
+
+  freeform_tags = {
+    shape = "nonflex"
+  }
 }
 
 # * This module will create a Flex Compute Instance, using OCPU and memory values provided to the module
@@ -92,6 +101,10 @@ module "instance_flex" {
   # networking parameters
   public_ip    = "EPHEMERAL"
   subnet_ocids = [oci_core_subnet.flex.id]
+
+  freeform_tags = {
+    shape = "flex"
+  }
 }
 
 resource "oci_core_subnet" "nonflex" {
