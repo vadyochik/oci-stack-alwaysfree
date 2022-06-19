@@ -5,7 +5,7 @@ dnf -y remove mlocate
 # Comment out to skip updates as it may take too long..
 dnf -y upgrade
 # Install required and usefull tools
-dnf -y install podman tmux
+dnf -y install podman tmux iptraf-ng
 
 IMAGE="${image}"
 ARGS="${args}"
@@ -73,3 +73,18 @@ fi
 
 # Enable daily auto-update of container images
 systemctl enable --now podman-auto-update.timer
+
+# If there are still plenty of memory let's run proxy_finder
+sleep 30
+if [[ $(awk '/MemAvailable/{print$2}' /proc/meminfo) -gt 1000000 ]]; then
+    echo 'Let us run proxy_finder!'
+    podman create \
+        --name proxy_finder \
+        --label "io.containers.autoupdate=registry" \
+        --pull=always \
+        ghcr.io/porthole-ascend-cinnamon/proxy_finder
+    podman generate systemd --restart-policy=always --new --files --name proxy_finder
+    mv -Z ./container-proxy_finder.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable --now container-proxy_finder.service
+fi
