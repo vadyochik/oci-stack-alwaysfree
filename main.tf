@@ -55,6 +55,10 @@ module "instance_nonflex" {
   # networking parameters
   public_ip    = "EPHEMERAL"
   subnet_ocids = [oci_core_subnet.nonflex.id]
+
+  freeform_tags = {
+    shape = "nonflex"
+  }
 }
 
 # * This module will create a Flex Compute Instance, using OCPU and memory values provided to the module
@@ -97,6 +101,10 @@ module "instance_flex" {
   # networking parameters
   public_ip    = "EPHEMERAL"
   subnet_ocids = [oci_core_subnet.flex.id]
+
+  freeform_tags = {
+    shape = "flex"
+  }
 }
 
 resource "oci_core_subnet" "nonflex" {
