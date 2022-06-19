@@ -5,6 +5,7 @@ Currently Oracle sets the following Always Free resources limits:
 - Non-flex shape VMs (VM.Standard.E2.1.Micro): standard-e2-micro-core-count = 2
 - Flex shape VMs (VM.Standard.A1.Flex): standard-a1-core-count = 4, standard-a1-memory-count = 24
 - Block volume size: total-free-storage-gb-regional = 200
+- Outbound Data Transfer: 10 TB per month
 
 So this stack creates 4 VMs each with 47GB (minimum default) boot volume:
 
@@ -36,11 +37,11 @@ Containers are managed by systemd service units:
 
 ### One-click deploy button
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/vadyochik/oci-stack-alwaysfree/releases/latest/download/oci-stack-alwaysfree-latest.zip)
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/vadyochik/oci-stack-alwaysfree/archive/refs/heads/main.zip)
 
 ### A bit more detailed info
 
-1. Download the [latest](../../releases/latest/download/oci-stack-alwaysfree-latest.zip) release of this module in *zip* format.
+1. Download the [latest](https://github.com/vadyochik/oci-stack-alwaysfree/archive/refs/heads/main.zip) release of this module in *zip* format.
 1. [Login](https://www.oracle.com/cloud/sign-in.html) to your Oracle Cloud account. If you still don't have one, [create it](https://signup.cloud.oracle.com/) - you'll need a valid CC with $1 for verification.
 1. (Optional) Create an OCI compartment. This is for grouping resources created by this stack. This step is not required and root compartment can be used instead. Follow the documentation for [creating a compartment](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcompartments.htm).
 1. In [Oracle Cloud Console](https://cloud.oracle.com/), open the navigation menu and click **Developer Services**. Under **Resource Manager**, click **Stacks**. Alternatevely, you can get to **Stacks** by entering the word "stacks" in the search bar.
